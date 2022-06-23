@@ -20,12 +20,13 @@ enum CameraMovement {
 
 struct Camera {
 public:
+	/* Constructor */
 	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float fov = 45.0f, float yaw = -90.0f, float pitch = 0.0f);
-
+	/* calculates and returns new view matrix */
 	glm::mat4 GetViewMatrix();
-
+	/* polls keyboard events */
 	void ProcessKeyboard(CameraMovement cameraMovement, float deltatime);
-
+	/* polls mouse events */
 	void ProcessMouse(float xoffset, float yoffset, bool mouseHidden, GLboolean constrainPitch = true);
 
 	float fov;

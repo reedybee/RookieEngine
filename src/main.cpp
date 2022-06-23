@@ -91,11 +91,14 @@ void mouse_pos_callback(GLFWwindow* window, double xposIn, double yposIn) {
 int main() {
 	std::cout << "Application Started\n\n";
 
+	// initializes glfw and a basic window profile
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
+
+	// creates a new renderer for rendering
 
 	Renderer renderer = Renderer();
 
@@ -103,6 +106,8 @@ int main() {
 	glfwSetFramebufferSizeCallback(renderer.GetWindow(), framebuffer_size_callback);
 	glfwSetKeyCallback(renderer.GetWindow(), keyboard_key_callback);
 	glfwSetCursorPosCallback(renderer.GetWindow(), mouse_pos_callback);
+
+	// initilize glad
 
 	if (!gladLoadGLLoader(GLADloadproc(glfwGetProcAddress)))
 		return 1;
@@ -117,6 +122,8 @@ int main() {
 	glCullFace(GL_BACK);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	// abstractions away from plain shader and sound code.
+
 	SoundEngine soundEngine = SoundEngine(&camera);
 
 	Shader shader = Shader("res/shaders/vertexShader.glsl", "res/shaders/fragmentShader.glsl");
@@ -128,6 +135,8 @@ int main() {
 	ImGui::StyleColorsDark();
 	ImGui_ImplGlfw_InitForOpenGL(renderer.GetWindow(), true);
 	ImGui_ImplOpenGL3_Init("#version 330");
+
+	// cube indices and vertices
 
 	glm::vec3 vertices[] = {
 		// position				 // normals			      // tex coords / uv's					  		 				   
@@ -183,6 +192,8 @@ int main() {
 		23,21,22
 	};
 
+	// buffers to render vertices and indices
+
 	#pragma region Buffers
 
 	unsigned int VAO, VBO, EBO;
@@ -208,6 +219,8 @@ int main() {
 
 #pragma endregion
 
+	// different textures to be sent to shader
+
 	Texture albedoMap = Texture();
 	albedoMap.CreateTexture("res/gfx/bricks/Bricks_color.jpg", GL_RGB);
 	shader.SetInt("albedoMap", 0);
@@ -220,6 +233,8 @@ int main() {
 	normalMap.CreateTexture("res/gfx/bricks/Bricks_normalGL.jpg", GL_RGB);
 	shader.SetInt("normalMap", 2);
 
+	// pretty self explainatory
+
 	glm::vec4 backgroundColor = { 0.2f, 0.5f, 0.8f, 1.0f };
 
 	glm::vec3 objectPosition = { 0.0f, 0.0f, 0.0f };
@@ -230,8 +245,9 @@ int main() {
 	float rot = 0.0f;
 
 	while (!renderer.WindowShouldClose()) {
+		// updates deltatime
 		renderer.PollDeltaTime();
-
+		// gets input calls
 		ProcessInput(renderer.GetWindow(), renderer.GetDeltaTime());
 
 		if (mouseHidden)
@@ -239,10 +255,12 @@ int main() {
 		if (!mouseHidden)
 			glfwSetInputMode(renderer.GetWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		
+		// background
 		glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+		
+		// imgui setup
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -262,6 +280,7 @@ int main() {
 		// Ends the window
 		ImGui::End();
 
+		// for shaders
 		glm::mat4 projection = glm::perspective(glm::radians(camera.fov), (float)windowW / (float)windowH, 0.1f, 100.0f);
 
 		glm::mat4 view = camera.GetViewMatrix();
@@ -290,10 +309,12 @@ int main() {
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
+		// finally, render.
 		renderer.SwapBuffers(45);
 	}
 	std::cout << "\n\nApplication Terminated\n";
 	
+	// cleanup
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();

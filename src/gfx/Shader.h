@@ -13,8 +13,11 @@ struct Shader {
 public:
 	/* constructor */
 	Shader(const char* vertexShaderFilePath = "", const char* fragmentShaderFilePath = "");
-
+	/* sets the shader to be used, this needs to be called before editing anything in shader */
 	void Use();
+
+	/* a whole bunch of functions for sending values to shader, 
+	explaining everyone of them would drive me into the abyss */
 
 	void SetInt(const char* name, int value) const;
 	void SetFloat(const char* name, float value) const;
